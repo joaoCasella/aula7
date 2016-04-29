@@ -1,136 +1,79 @@
 package exercicio1;
 
 public class Batalha extends Controller{
-	Treinador treinador = new Treinador("Ash"); 
-	Treinador treinador2 = new Treinador("Brock");
-	
-	public void prepara(){
-		Preparacao teste = new Preparacao();
-		teste.associaPokemons(treinador, treinador2);
-		teste.associaAtaques(treinador, treinador2);
-	}
-	//Todos os metodos que servirao de base para a criacao de eventos estao separa
-	//dos em 1 e 2. Embora seja possivel fazer um metodo chamado ataque que serve
-	//para o uso dos dois treinadores, foi escolhido este para permitir uma melhor
-	//vizualizacao do que acontecera e pois nao se consegue confundir no seu uso
-	//(ou seja, evita erros desnecessarios).
-	private class AtaqueDe1em2 extends Event {
-		private int decisao = 1;
+	Treinador treinador = new Treinador("Ash", "Pikachu", "Choque do Trovao", 32.0, "Esfera Eletrica", 28.0, "Investida Trovao", 30.0, "Ataque Rapido", 28.0,
+												"Charmander", "Brasas", 28.0, "Lanca-chamas", 32.0, "Garra de Metal", 30.0, "Furia", 25.0,
+												"Squirtle", "Bolhas", 27.0, "Rajada de Bolhas", 32.0, "Hidro Bomba", 28.0, "Raio de Gelo", 30.0,
+												"Bulbasaur", "Raio Solar", 25.0, "Folha Navalha", 28.0, "Chicote de Cipo", 29.0, "Investida", 30.0); 
+	Treinador treinador2 = new Treinador("Brock", "Onix", "Triturar", 23.0, "Cavar", 25.0, "Investida", 22.0, "Batida", 20.0,
+												"Geodude", "Poder Oculto", 22.0, "Lancamento de Rocha", 29.0, "Investida", 22.0, "Mega-soco", 23.0,
+												"Zubat", "Supersonico", 22.0, "Voar", 21.0, "Redemoinho de Vento", 23.0, "Mordida", 24.0,
+												"Vulpix", "Agilidade", 10.0, "Giro de fogo", 20.0, "Lanca-chamas", 22.0, "Trovao", 15.0);
+
+	private class Ataque extends Event {
+		private boolean decisao = true;
+		private Treinador trainer;
+		private Treinador trainer2;
 		
-		public AtaqueDe1em2(long eventTime) {
+		public Ataque(long eventTime, Treinador trainer, Treinador trainer2) {
 			super(eventTime);
+			this.trainer = trainer;
+			this.trainer2 = trainer2;
 		}
 		
 		public void action(){
-			decisao = treinador2.tomarHit(treinador.acertarHit());
+			decisao = trainer.acertarHit(trainer2);
 		}
 		
 		public String description() {
-			if(decisao == 0)
-				return ""+treinador.getNome()+" usou o ataque "+treinador.getAtaque()+" do pokemon "+treinador.getPokemonAtual()+"\nFim da luta com "+treinador.getNome()+" vencedor!";
-			else if(decisao == 1)
-				return ""+treinador.getNome()+" usou o ataque "+treinador.getAtaque()+" do pokemon "+treinador.getPokemonAtual()+".";
+			if(decisao == false)
+				return ""+trainer.getNome()+" usou o ataque "+trainer.getAtaque()+" do pokemon "+trainer.getPokemonAtual()+"\nFim da luta com "+trainer.getNome()+" vencedor!";
 			else
-				return ""+treinador.getNome()+" usou o ataque "+treinador.getAtaque()+" do pokemon "+treinador.getPokemonAtual()+".\n"+treinador2.getNome()+" agora esta com "+treinador2.getPokemonAtual()+"";
-		}
-		//Aqui se percebe o motivo de o metodo tomarHit retornar int. Isso acontece
-		//pois cada resposta leva a uma mensagem exibida diferente. O numero 0 indi
-		//ca que todos os pokemons do treinador atingido estao sem vida, logo ele 
-		//perdeu, o que emite a mensagem de vitoria do outro. Ja o numero 1 indica
-		//que o pokemon atual que recebeu o dano ainda esta vivo, e segue lutando.
-		//Ja 2 indica que o ataque incapacitou o pokemon que recebeu o hit, e como
-		//o metodo ja muda o pokemon ativo, informa-se qual o pokemon que sera usa
-		//a partir de agora pelo treinador.
-	}
-	
-	private class AtaqueDe2em1 extends Event {
-		private int decisao = 0;
-		
-		public AtaqueDe2em1(long eventTime) {
-			super(eventTime);
-		}
-		public void action(){
-			decisao = treinador.tomarHit(treinador2.acertarHit());
-		}
-		public String description() {
-			if(decisao == 0)
-				return ""+treinador2.getNome()+" usou o ataque "+treinador2.getAtaque()+" do pokemon "+treinador2.getPokemonAtual()+"\nFim da luta com "+treinador2.getNome()+" vencedor!";
-			else if(decisao == 1)
-				return ""+treinador2.getNome()+" usou o ataque "+treinador2.getAtaque()+" do pokemon "+treinador2.getPokemonAtual()+".";
-			else
-				return ""+treinador2.getNome()+" usou o ataque "+treinador2.getAtaque()+" do pokemon "+treinador2.getPokemonAtual()+".\n"+treinador.getNome()+" agora esta com "+treinador.getPokemonAtual()+"";
+				return ""+trainer.getNome()+" usou o ataque "+trainer.getAtaque()+" do pokemon "+trainer.getPokemonAtual()+".";
 		}
 	}
 	
 	private class trocaPokemonAtivo extends Event {	
-		public trocaPokemonAtivo(long eventTime) {
+		private Treinador trainer;
+		public trocaPokemonAtivo(long eventTime, Treinador trainer) {
 			super(eventTime);
+			this.trainer = trainer;
 		}
 		public void action(){
-			treinador.mudaPokemon();
+			trainer.mudaPokemon();
 		}
 		public String description() {
-			return ""+treinador.getNome()+" trocou para o pokemon "+treinador.getPokemonAtual()+".";
-		}
-	}
-	
-	private class trocaPokemonAtivo2 extends Event {	
-		public trocaPokemonAtivo2(long eventTime) {
-			super(eventTime);
-		}
-		public void action(){
-			treinador2.mudaPokemon();
-		}
-		public String description() {
-			return ""+treinador2.getNome()+" trocou para o pokemon "+treinador2.getPokemonAtual()+".";
+			return ""+trainer.getNome()+" trocou para o pokemon "+trainer.getPokemonAtual()+".";
 		}
 	}
 
-	private class curaPokemonAtivo extends Event {	
-		public curaPokemonAtivo(long eventTime) {
+	private class curaPokemonAtivo extends Event {
+		private Treinador trainer;
+		public curaPokemonAtivo(long eventTime, Treinador trainer) {
 			super(eventTime);
+			this.trainer = trainer;
 		}
 		public void action(){
-			treinador.mudaPokemon();
+			trainer.recuperaVida();
 		}
 		public String description() {
-			return ""+treinador.getNome()+" usou item de cura no pokemon "+treinador.getPokemonAtual()+".";
-		}
-	}
-	
-	private class curaPokemonAtivo2 extends Event {	
-		public curaPokemonAtivo2(long eventTime) {
-			super(eventTime);
-		}
-		public void action(){
-			treinador2.mudaPokemon();
-		}
-		public String description() {
-			return ""+treinador2.getNome()+" usou item de cura no pokemon "+treinador2.getPokemonAtual()+".";
+			return ""+trainer.getNome()+" usou item de cura no pokemon "+trainer.getPokemonAtual()+".";
 		}
 	}
 	
 	private class correr extends Event {
-		public correr(long eventTime) {
+		private Treinador trainer;
+		private Treinador trainer2;
+		public correr(long eventTime, Treinador trainer, Treinador trainer2) {
 			super(eventTime);
+			this.trainer = trainer;
+			this.trainer2 = trainer2;
 		}
 		public void action(){
-			
+			return;
 		}
 		public String description(){
-			return ""+treinador.getNome()+" correu da luta.\n"+treinador2.getNome()+" eh o vencedor.";
-		}
-	}
-	
-	private class correr2 extends Event {
-		public correr2(long eventTime) {
-			super(eventTime);
-		}
-		public void action(){
-			
-		}
-		public String description(){
-			return ""+treinador2.getNome()+" correu da luta.\n"+treinador.getNome()+" eh o vencedor.";
+			return ""+trainer.getNome()+" correu da luta.\n"+trainer2.getNome()+" eh o vencedor.";
 		}
 	}
 	
@@ -141,53 +84,61 @@ public class Batalha extends Controller{
 		public void action() {
 			long tm = System.currentTimeMillis();
 			
-			addEvent(new AtaqueDe1em2(tm));
-			addEvent(new AtaqueDe2em1(tm + 100));
+			addEvent(new Ataque(tm, treinador, treinador2));
+			addEvent(new Ataque(tm + 100, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 200));
-			addEvent(new AtaqueDe2em1(tm + 300));
+			addEvent(new Ataque(tm + 200, treinador, treinador2));
+			addEvent(new Ataque(tm + 300, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 400)); 
-			addEvent(new AtaqueDe2em1(tm + 500));
+			addEvent(new Ataque(tm + 400, treinador, treinador2)); 
+			addEvent(new Ataque(tm + 500, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 600));
+			addEvent(new Ataque(tm + 600, treinador, treinador2));
+			addEvent(new trocaPokemonAtivo(tm + 650, treinador2));
 			
-			addEvent(new curaPokemonAtivo(tm + 700));
-			addEvent(new AtaqueDe2em1(tm + 800));
+			addEvent(new curaPokemonAtivo(tm + 700, treinador));
+			addEvent(new Ataque(tm + 800, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 900));
-			addEvent(new AtaqueDe2em1(tm + 1000));
+			addEvent(new Ataque(tm + 900, treinador, treinador2));
+			addEvent(new Ataque(tm + 1000, treinador2, treinador));
+			addEvent(new trocaPokemonAtivo(tm + 1050, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 1100));
-			addEvent(new AtaqueDe2em1(tm + 1200));
+			addEvent(new Ataque(tm + 1100, treinador, treinador2));
+			addEvent(new Ataque(tm + 1200, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 1300));
-			addEvent(new AtaqueDe2em1(tm + 1400));
+			addEvent(new Ataque(tm + 1300, treinador, treinador2));
+			addEvent(new Ataque(tm + 1400, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 1500));
+			addEvent(new Ataque(tm + 1500, treinador, treinador2));
+			addEvent(new trocaPokemonAtivo(tm + 1550, treinador2));
 			
-			addEvent(new AtaqueDe1em2(tm + 1600));
-			addEvent(new AtaqueDe2em1(tm + 1700));
+			addEvent(new Ataque(tm + 1600, treinador, treinador2));
+			addEvent(new Ataque(tm + 1700, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 1800));
-			addEvent(new AtaqueDe2em1(tm + 1900));
+			addEvent(new Ataque(tm + 1800, treinador, treinador2));
+			addEvent(new Ataque(tm + 1900, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 2000));
-			addEvent(new AtaqueDe2em1(tm + 2100));
+			addEvent(new Ataque(tm + 2000, treinador, treinador2));
+			addEvent(new Ataque(tm + 2100, treinador2, treinador));
+			addEvent(new trocaPokemonAtivo(tm + 2150, treinador));
 			
-			addEvent(new trocaPokemonAtivo2(tm + 2200));
-			addEvent(new AtaqueDe1em2(tm + 2300));
+			addEvent(new curaPokemonAtivo(tm + 2200, treinador2));
+			addEvent(new Ataque(tm + 2300, treinador, treinador2));
 			
-			addEvent(new AtaqueDe1em2(tm + 2400));
-			addEvent(new AtaqueDe2em1(tm + 2500));
+			addEvent(new Ataque(tm + 2400, treinador, treinador2));
+			addEvent(new trocaPokemonAtivo(tm + 2500, treinador2));
 			
-			addEvent(new AtaqueDe1em2(tm + 2600));
-			addEvent(new AtaqueDe2em1(tm + 2700));
+			addEvent(new Ataque(tm + 2600, treinador, treinador2));
+			addEvent(new Ataque(tm + 2700, treinador2, treinador));
 			
-			addEvent(new AtaqueDe1em2(tm + 2800));
+			addEvent(new Ataque(tm + 2800, treinador, treinador2));
+			addEvent(new Ataque(tm + 2900, treinador2, treinador));
 			
-			addEvent(new curaPokemonAtivo2(tm + 2900));
-			addEvent(new AtaqueDe1em2(tm + 3000));
+			addEvent(new Ataque(tm + 3000, treinador, treinador2));
+			addEvent(new Ataque(tm + 3100, treinador2, treinador));
+			
+			addEvent(new Ataque(tm + 3200, treinador, treinador2));
+
 		}
 		public String description() {
 			return "Comeca a batalha";
@@ -199,7 +150,6 @@ public class Batalha extends Controller{
 	
 	public static void main(String[] args) {
 		Batalha gc = new Batalha();
-		gc.prepara();
 		long tm = System.currentTimeMillis();
 		gc.addEvent(gc.new Inicio(tm));
 		gc.run();
